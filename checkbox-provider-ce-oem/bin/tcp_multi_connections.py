@@ -4,6 +4,7 @@ import argparse
 import threading
 import logging
 import time
+import struct
 from datetime import datetime, timedelta
 
 logging.basicConfig(
@@ -144,6 +145,16 @@ def send_payload(host, port, payload, start_time):
         logging.error("{}: An unexpected error occurred for port {}"
                       .format(e, port))
         results.append("{}:ERROR".format(port))
+
+
+def send_rst(host, port):
+    server_host = (host, port)
+    l_onoff = 1
+    l_linger = 0
+    with socket.create_connection(server_host) as client_socket:
+        client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER,
+                                 struct.pack('ii', l_onoff, l_linger))
+        client_socket.close()
 
 
 if __name__ == "__main__":
